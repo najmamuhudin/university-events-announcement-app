@@ -7,6 +7,7 @@ import '../utils/constants.dart';
 import '../utils/image_helper.dart';
 import 'event_details_screen.dart';
 
+// Screen that displays a list of events fetched from the EventProvider
 class EventsListScreen extends StatefulWidget {
   const EventsListScreen({super.key});
 
