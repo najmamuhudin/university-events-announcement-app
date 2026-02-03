@@ -8,13 +8,14 @@ import '../providers/admin_provider.dart';
 import 'package:intl/intl.dart';
 import 'create_event_screen.dart';
 import 'post_announcement_screen.dart';
+import '../providers/navigation_provider.dart';
+import 'registered_students_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  State<Dashboard
-  Screen> createState() => _DashboardScreenState();
+  State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
@@ -51,24 +52,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               _buildHeader(),
               const SizedBox(height: 24),
-
               _sectionTitle("Key Metrics"),
               const SizedBox(height: 12),
               _buildMetrics(stats),
-
               const SizedBox(height: 16),
               _buildPendingCard(stats),
-
               const SizedBox(height: 24),
               _sectionTitle("Quick Actions"),
               const SizedBox(height: 12),
               _buildQuickActions(context),
-
               const SizedBox(height: 24),
               _sectionTitle("Engagement Overview"),
               const SizedBox(height: 12),
               _buildChart(),
-
               const SizedBox(height: 24),
               _sectionTitle("Recent Activity"),
               const SizedBox(height: 12),
@@ -109,22 +105,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Row(
       children: [
         Expanded(
-          child: _metricCard(
-            title: "Total Students",
-            value: stats?['totalStudents']?.toString() ?? "12,450",
-            subtitle: stats != null ? "Registered" : "+2.4%",
-            icon: Icons.groups,
-            subtitleColor: Colors.green,
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RegisteredStudentsScreen(),
+                ),
+              );
+            },
+            child: _metricCard(
+              title: "Total Students",
+              value: stats?['totalStudents']?.toString() ?? "12,450",
+              subtitle: stats != null ? "Registered" : "+2.4%",
+              icon: Icons.groups,
+              subtitleColor: Colors.green,
+            ),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: _metricCard(
-            title: "Active Events",
-            value: stats?['activeEvents']?.toString() ?? "18",
-            subtitle: "Live Now",
-            icon: Icons.calendar_today,
-            subtitleColor: Color(0xFF3A4F9B),
+          child: InkWell(
+            onTap: () {
+              Provider.of<NavigationProvider>(context, listen: false)
+                  .setIndex(2);
+            },
+            child: _metricCard(
+              title: "Active Events",
+              value: stats?['activeEvents']?.toString() ?? "18",
+              subtitle: "Live Now",
+              icon: Icons.calendar_today,
+              subtitleColor: Color(0xFF3A4F9B),
+            ),
           ),
         ),
       ],
@@ -172,45 +184,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // ================= PENDING =================
   Widget _buildPendingCard(Map<String, dynamic>? stats) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: _cardDecoration(),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Pending Inquiries",
-                style: TextStyle(color: Colors.grey),
+    return InkWell(
+      onTap: () {
+        Provider.of<NavigationProvider>(context, listen: false).setIndex(3);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: _cardDecoration(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Pending Inquiries",
+                  style: TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  stats?['pendingInquiries']?.toString() ?? "5",
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFE7C2),
+                borderRadius: BorderRadius.circular(20),
               ),
-              const SizedBox(height: 8),
-              Text(
-                stats?['pendingInquiries']?.toString() ?? "5",
-                style: const TextStyle(
-                  fontSize: 26,
+              child: const Text(
+                "HIGH PRIORITY",
+                style: TextStyle(
+                  color: Colors.orange,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFE7C2),
-              borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text(
-              "HIGH PRIORITY",
-              style: TextStyle(
-                color: Colors.orange,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -333,16 +350,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     if (activities == null || activities.isEmpty) {
       return Column(
-        children: const [
-          _ActivityTile(
+        children: [
+          const _ActivityTile(
             icon: Icons.check_circle,
             iconColor: Color(0xFF3A4F9B),
             title: "Annual Career Fair",
             subtitle: "Event approved and published by Admin Sarah",
             time: "2 hours ago",
           ),
-          SizedBox(height: 12),
-          _ActivityTile(
+          const SizedBox(height: 12),
+          const _ActivityTile(
             icon: Icons.chat,
             iconColor: Colors.purple,
             title: "New Support Inquiry",
@@ -359,9 +376,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           padding: const EdgeInsets.only(bottom: 12.0),
           child: _ActivityTile(
             icon: activity['icon'] == 'event' ? Icons.check_circle : Icons.chat,
-            iconColor: activity['icon'] == 'event'
-                ? Color(0xFF3A4F9B)
-                : Colors.purple,
+            iconColor:
+                activity['icon'] == 'event' ? Color(0xFF3A4F9B) : Colors.purple,
             title: activity['title'] ?? "Untitled",
             subtitle: activity['subtitle'] ?? "",
             time: _formatTime(activity['time']),
@@ -493,7 +509,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: const Icon(
               Icons.event_available,
               color: Color(0xFF3A4F9B),
-
               size: 30,
             ),
           ),
@@ -553,16 +568,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // ================= HELPERS =================
   BoxDecoration _cardDecoration() => BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(16),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.05),
-        blurRadius: 8,
-        offset: const Offset(0, 4),
-      ),
-    ],
-  );
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      );
 
   TextStyle _greyText() => const TextStyle(color: Colors.grey, fontSize: 13);
 

@@ -34,7 +34,7 @@ class EventService {
       body: jsonEncode(eventData),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       return jsonDecode(response.body);
     } else {
       throw Exception(
@@ -54,9 +54,8 @@ class EventService {
     request.headers['Authorization'] = 'Bearer $token';
 
     // Add content type for web compatibility
-    final mimeType = filename.toLowerCase().endsWith('.png')
-        ? 'image/png'
-        : 'image/jpeg';
+    final mimeType =
+        filename.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
 
     request.files.add(
       http.MultipartFile.fromBytes(

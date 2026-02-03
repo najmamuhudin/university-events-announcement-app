@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/admin_provider.dart';
+import '../providers/navigation_provider.dart';
 import 'package:intl/intl.dart';
 
 class InquiriesScreen extends StatefulWidget {
@@ -28,7 +29,6 @@ class _InquiriesScreenState extends State<InquiriesScreen> {
       appBar: _appBar(),
       body: Column(
         children: [
-          _searchBar(),
           _filters(),
           Expanded(
             child: Consumer<AdminProvider>(
@@ -70,8 +70,7 @@ class _InquiriesScreenState extends State<InquiriesScreen> {
                   itemCount: filtered.length,
                   itemBuilder: (context, index) {
                     final item = filtered[index];
-                    final date =
-                        DateTime.tryParse(item['createdAt'] ?? '') ??
+                    final date = DateTime.tryParse(item['createdAt'] ?? '') ??
                         DateTime.now();
                     final timeStr = DateFormat('MMM d, h:mm a').format(date);
 
@@ -84,6 +83,14 @@ class _InquiriesScreenState extends State<InquiriesScreen> {
                       active: index == 0,
                       onTap: () {
                         _showInquiryDetails(context, item, admin);
+                      },
+                      onDelete: () {
+                        _showDeleteInquiryDialog(
+                          context,
+                          item['_id'],
+                          item['subject'] ?? 'No Subject',
+                          admin,
+                        );
                       },
                     );
                   },
@@ -101,9 +108,11 @@ class _InquiriesScreenState extends State<InquiriesScreen> {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
-      leading: const Padding(
-        padding: EdgeInsets.all(12),
-        child: Icon(Icons.forum, color: Color(0xFF3A4F9B), size: 28),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.black),
+        onPressed: () {
+          Provider.of<NavigationProvider>(context, listen: false).setIndex(0);
+        },
       ),
       title: const Text(
         "Inquiries",
@@ -114,46 +123,7 @@ class _InquiriesScreenState extends State<InquiriesScreen> {
         ),
       ),
       centerTitle: false,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.filter_list, color: Colors.black),
-          onPressed: () {},
-        ),
-        IconButton(
-          icon: const Icon(Icons.more_vert, color: Colors.black),
-          onPressed: () {},
-        ),
-      ],
-    );
-  }
-
-  // ================= SEARCH =================
-  Widget _searchBar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: TextField(
-          style: const TextStyle(color: Colors.black),
-          decoration: InputDecoration(
-            hintText: "Search students or subjects",
-            hintStyle: TextStyle(color: Colors.grey.shade500),
-            prefixIcon: const Icon(Icons.search, color: Color(0xFF3A4F9B)),
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 15),
-          ),
-        ),
-      ),
+      actions: [],
     );
   }
 
@@ -360,6 +330,51 @@ class _InquiriesScreenState extends State<InquiriesScreen> {
     );
   }
 
+  void _showDeleteInquiryDialog(
+    BuildContext context,
+    String? id,
+    String subject,
+    AdminProvider admin,
+  ) {
+    if (id == null) return;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Delete Inquiry"),
+        content: Text("Are you sure you want to delete inquiry: '$subject'?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await admin.deleteInquiry(id);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Inquiry deleted")),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Error deleting: $e"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
   // ================= INQUIRY TILE =================
   Widget _inquiryTile({
     required String name,
@@ -369,6 +384,7 @@ class _InquiriesScreenState extends State<InquiriesScreen> {
     required String status,
     bool active = false,
     VoidCallback? onTap,
+    VoidCallback? onDelete,
   }) {
     bool pending = status == "PENDING";
 
@@ -466,6 +482,14 @@ class _InquiriesScreenState extends State<InquiriesScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline,
+                            color: Colors.redAccent, size: 20),
+                        onPressed: onDelete,
+                        constraints: const BoxConstraints(),
+                        padding: EdgeInsets.zero,
                       ),
                     ],
                   ),

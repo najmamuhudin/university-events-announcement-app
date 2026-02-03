@@ -52,20 +52,6 @@ class ProfileScreen extends StatelessWidget {
                       role.toUpperCase(),
                     ),
                   ]),
-
-                  const SizedBox(height: 24),
-                  _sectionTitle("Settings & Security"),
-                  const SizedBox(height: 12),
-                  _buildInfoCard([
-                    _actionTile(Icons.person_outline, "Edit Profile", () {}),
-                    _actionTile(Icons.lock_outline, "Change Password", () {}),
-                    _actionTile(
-                      Icons.notifications_outlined,
-                      "Notification Settings",
-                      () {},
-                    ),
-                  ]),
-
                   const SizedBox(height: 24),
                   _sectionTitle("App Preferences"),
                   const SizedBox(height: 12),
@@ -78,7 +64,6 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     _actionTile(Icons.help_outline, "Help & Support", () {}),
                   ]),
-
                   const SizedBox(height: 32),
                   _buildLogoutButton(context),
                   const SizedBox(height: 40),
@@ -98,7 +83,7 @@ class ProfileScreen extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF3A4F9B),Color(0xFF3A4F9B)],
+          colors: [Color(0xFF3A4F9B), Color(0xFF3A4F9B)],
         ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(32),
@@ -151,21 +136,6 @@ class ProfileScreen extends StatelessWidget {
                       color: Color(0xFF3A4F9B),
                     ),
                   ),
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: Colors.green,
-                    shape: BoxShape.circle,
-                    border: Border.fromBorderSide(
-                      BorderSide(color: Colors.white, width: 2),
-                    ),
-                  ),
-                  child: const Icon(Icons.edit, size: 14, color: Colors.white),
                 ),
               ),
             ],

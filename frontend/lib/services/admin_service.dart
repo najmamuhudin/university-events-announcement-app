@@ -34,7 +34,7 @@ class AdminService {
       body: jsonEncode(data),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       return jsonDecode(response.body);
     } else {
       throw Exception(
@@ -73,7 +73,7 @@ class AdminService {
       body: jsonEncode(data),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       return jsonDecode(response.body);
     } else {
       throw Exception('Failed to send inquiry');
@@ -149,6 +149,39 @@ class AdminService {
       throw Exception(
         jsonDecode(response.body)['message'] ?? 'Failed to delete announcement',
       );
+    }
+  }
+
+  Future<void> deleteInquiry(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final response = await http.delete(
+      Uri.parse('${AppConstants.baseUrl}/inquiries/$id'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        jsonDecode(response.body)['message'] ?? 'Failed to delete inquiry',
+      );
+    }
+  }
+
+  // Students
+  Future<List<dynamic>> getStudents() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse('${AppConstants.baseUrl}/admin/students'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to load students');
     }
   }
 }

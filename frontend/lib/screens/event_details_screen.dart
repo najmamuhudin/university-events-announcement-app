@@ -57,26 +57,7 @@ class EventDetailsScreen extends StatelessWidget {
                     onPressed: () => Navigator.pop(context),
                   ),
                 ),
-                actions: [
-                  Container(
-                    margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        const BoxShadow(color: Colors.black12, blurRadius: 4),
-                      ],
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.share,
-                        color: Colors.black,
-                        size: 20,
-                      ),
-                      onPressed: () {},
-                    ),
-                  ),
-                ],
+                actions: [],
                 flexibleSpace: FlexibleSpaceBar(
                   background: ImageHelper.buildNetworkImage(
                     event['imageUrl'],
@@ -175,24 +156,6 @@ class EventDetailsScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF3A4F9B).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'Add to Calendar',
-                                style: GoogleFonts.inter(
-                                  color: const Color(0xFF3A4F9B),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                       ),
@@ -263,9 +226,8 @@ class EventDetailsScreen extends StatelessWidget {
                       }
                     },
               style: ElevatedButton.styleFrom(
-                backgroundColor: isRegistered
-                    ? Colors.grey
-                    : const Color(0xFF3A4F9B),
+                backgroundColor:
+                    isRegistered ? Colors.grey : const Color(0xFF3A4F9B),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 shape: RoundedRectangleBorder(

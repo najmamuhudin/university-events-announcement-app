@@ -7,12 +7,14 @@ class AdminProvider with ChangeNotifier {
 
   List<dynamic> _announcements = [];
   List<dynamic> _inquiries = [];
+  List<dynamic> _students = [];
   Map<String, dynamic>? _stats;
   bool _isLoading = false;
   String? _error;
 
   List<dynamic> get announcements => _announcements;
   List<dynamic> get inquiries => _inquiries;
+  List<dynamic> get students => _students;
   Map<String, dynamic>? get stats => _stats;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -128,7 +130,33 @@ class AdminProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _error = e.toString();
+    }
+  }
+
+  Future<void> deleteInquiry(String id) async {
+    _error = null;
+    try {
+      await _adminService.deleteInquiry(id);
+      _inquiries.removeWhere((i) => i['_id'] == id);
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
       rethrow;
+    }
+  }
+
+  Future<void> fetchStudents() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      _students = await _adminService.getStudents();
+    } catch (e) {
+      _error = e.toString();
+      print('Error fetching students: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 }
