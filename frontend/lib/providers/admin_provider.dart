@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/admin_service.dart';
 
+/// Provider for managing admin-related data such as announcements, inquiries, and stats.
 class AdminProvider with ChangeNotifier {
   final AdminService _adminService = AdminService();
 
