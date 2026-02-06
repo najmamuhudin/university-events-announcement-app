@@ -32,18 +32,18 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error('A user with this ID Number already exists');
     }
 
-    // Default role assignment: Force role to be 'student' for public registrations to prevent unauthorized admin creation
-    const role = 'student';
-
     // Password Hashing: Generate salt and hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Default role assignment
+    const role = 'student';
 
     // Create the new user in the database
     const user = await User.create({
         name,
         email,
-        password: hashedPassword, // Store hashed password only
+        password: hashedPassword, // Store hashed password for security
         studentId,
         role,
         department: req.body.department || 'General',
@@ -77,7 +77,7 @@ const loginUser = asyncHandler(async (req, res) => {
     // Check for user by email
     const user = await User.findOne({ email });
 
-    // Compare plain-text password with hashed password in DB
+    // Compare provided password with hashed password in DB
     if (user && (await bcrypt.compare(password, user.password))) {
         res.json({
             _id: user.id,
@@ -104,6 +104,52 @@ const getMe = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc    Forgot Password Request
+ * @route   POST /api/auth/forgot-password
+ * @access  Public
+ */
+const forgotPassword = asyncHandler(async (req, res) => {
+    const { email, studentId } = req.body;
+
+    const user = await User.findOne({ email, studentId });
+
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found with these details');
+    }
+
+    // Since we don't have an email server, we'll return a "Security Code"
+    // In a real app, this would be emailed as a link.
+    res.json({
+        message: 'Identity verified. You can now reset your password.',
+        token: user._id // Simple demo token: using User ID as the override permission
+    });
+});
+
+/**
+ * @desc    Reset Password
+ * @route   POST /api/auth/reset-password
+ * @access  Public
+ */
+const resetPassword = asyncHandler(async (req, res) => {
+    const { token, newPassword } = req.body;
+
+    const user = await User.findById(token);
+
+    if (!user) {
+        res.status(400);
+        throw new Error('Invalid reset token');
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    res.json({ message: 'Password reset successful' });
+});
+
+/**
  * Generate JWT Token
  * @param {string} id - User ID
  * @returns {string} JWT Token
@@ -117,5 +163,7 @@ const generateToken = (id) => {
 module.exports = {
     registerUser,
     loginUser,
+    forgotPassword,
+    resetPassword,
     getMe,
 };
